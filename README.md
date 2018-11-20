@@ -1,8 +1,8 @@
+[![npm version](https://badge.fury.io/js/npx-server.svg)](https://badge.fury.io/js/npx-server)
 
-
-    npx @stopsopa/npx-server
+    npx npx-server
     
     or
     
-    npx @stopsopa/npx-server server.js
+    npx npx-server server.js
     
