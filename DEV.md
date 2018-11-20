@@ -1,7 +1,7 @@
 
 
-    git clone git@github.com:stopsopa/npx-server.git npx-server1
-    cd npx-server1
+    git clone git@github.com:stopsopa/npx-server.git npx-server
+    cd npx-server
     npm login
     .. change files, commit to git and run:
     make u
