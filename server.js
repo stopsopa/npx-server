@@ -133,7 +133,13 @@ const args = (function (obj, tmp) {
                     return obj[tmp] = [a];
                 }
 
-                obj[tmp].push(a);
+                try {
+
+                    obj[tmp].push(a);
+                }
+                catch (e) {
+
+                }
             }
         })
     ;
