@@ -563,6 +563,10 @@ var mkdirP = (function () {
 
             if ( fs.existsSync(file)) {
 
+                const package = require(path.resolve(__dirname, 'package.json'));
+
+                log(`npx-server v${package.version}`);
+
                 log(`\nFile '${file}' was created, try now:\n\n    node ${file.substring(project.length + 1)} --help\n`);
             }
             else {
