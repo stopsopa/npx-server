@@ -226,9 +226,10 @@ if (args.get('help')) {
     process.stdout.write(`
 Standalone static files http server with no dependencies
     
-@author Szymon Działowski https://github.com/stopsopa
+@homepage https://github.com/stopsopa/npx-server
 @date 29 Nov 2017
 @license MIT    
+@author Szymon Działowski https://github.com/stopsopa
 
 parameters:
 
@@ -629,16 +630,23 @@ else {
 
     const controllers = () => {
 
-        const dir = path.resolve(__dirname, staticServer);
+        try {
 
-        return fs.readdirSync(dir).map(file => {
+            const dir = path.resolve(__dirname, staticServer);
 
-            const lib = path.resolve(dir, file);
+            return fs.readdirSync(dir).map(file => {
 
-            delete require.cache[lib];
+                const lib = path.resolve(dir, file);
 
-            return require(lib);
-        });
+                delete require.cache[lib];
+
+                return require(lib);
+            });
+        }
+        catch (e) {
+
+            return [];
+        }
     }
 
     server.on('request', function (req, res) {
