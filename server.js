@@ -17,6 +17,16 @@ var script    = 'node ' + thisScript;
 
 var sp = ['node', [thisScript]];
 
+var staticServer = '-staticServer-';
+// var staticServer = false;
+
+let staticServerAbs = false;
+
+if (staticServer) {
+
+    staticServerAbs = path.resolve(__dirname, staticServer);
+}
+
 const log = function () {
     Array.prototype.slice.call(arguments).map(i => i + "\n").forEach(i => process.stdout.write(i));
 };
@@ -26,6 +36,22 @@ function isArray(obj) {
 };
 function isObject(a) {
     return Object.prototype.toString.call(a) === '[object Object]';
+};
+
+const mkdirP = require('./lib/mkdirp');
+
+const prepareDir = target => {
+
+    try {
+
+        mkdirP.sync(target);
+    }
+    catch (e) {
+
+        process.stdout.write(`\n    ERROR prepareDir: ${e}\n`);
+
+        process.exit(1);
+    }
 };
 
 const raceThrottleDebounce = (function () {
@@ -185,6 +211,17 @@ const args = (function (obj, tmp) {
 
 if (args.get('help')) {
 
+    let ssman = '';
+
+    if (staticServer) {
+
+        ssman = `        
+    --gc "/path"
+    
+        generate controller /path in directory '${staticServerAbs}'
+`;
+    }
+
     process.stdout.write(`
 Standalone static files http server with no dependencies
     
@@ -245,13 +282,68 @@ parameters:
         
     --dump 
     
-        output config
-        
+        output config        
+    ${ssman}
     --flag 
     
         just extra allowed flag for searching processes using 'ps aux | grep [flagvalue]'
     
 `);
+    process.exit(0);
+}
+
+var gc = args.get('gc');
+
+if (staticServer && gc) {
+
+    let file = gc.replace(/[^a-z\d-_]/g, '') + '.js';
+
+    if ( ! file ) {
+
+        process.stdout.write(`Can't generate path from url '${gc}'`);
+
+        process.exit(1);
+    }
+
+    file = path.resolve(staticServerAbs, file);
+
+    prepareDir(path.dirname(file));
+
+    if (fs.existsSync(file)) {
+
+        process.stdout.write(`Error: Controller '${file}' already exist`);
+
+        process.exit(1);
+    }
+
+    fs.appendFileSync(file, `
+const controller = (req, res, query = {}) => {
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+
+    res.end(JSON.stringify({
+        page: {
+            query,
+        }
+    }));
+}
+
+controller.url = '${gc}';
+
+module.exports = controller;
+`);
+
+    if ( fs.existsSync(file) ) {
+
+        process.stdout.write(`Controller '${file}' successfully created`);
+    }
+    else {
+
+        process.stdout.write(`Error: Controller '${file}' couldn't be created`);
+
+        process.exit(1);
+    }
+
     process.exit(0);
 }
 
@@ -289,7 +381,7 @@ const diff = function(a, b) {
 
         process.exit(1);
     }
-}(diff(Object.keys(args.all()), 'port dir noindex log help watch ignore inject debug config dump flag'.split(' '))));
+}(diff(Object.keys(args.all()), ('port dir noindex log help watch ignore inject debug config dump flag' + (staticServer ? ' gc' : '')).split(' '))));
 
 function execArgs (args, str) {
     var arr = ['--inject'];
@@ -534,7 +626,28 @@ else {
         return content;
     }
 
+    const controllers = () => {
+
+        const dir = path.resolve(__dirname, staticServer);
+
+        return fs.readdirSync(dir).map(file => {
+
+            const lib = path.resolve(dir, file);
+
+            delete require.cache[lib];
+
+            return require(lib);
+        });
+    }
+
     server.on('request', function (req, res) {
+
+        if (req.url === '/run-sandbox-server.sh-check') {
+
+            res.statusCode = 201;
+
+            return res.end('ok')
+        }
 
         if (inject) {
 
@@ -552,6 +665,12 @@ else {
         }
 
         var url = req.url.split('?')[0];
+
+        // (function (a) {
+        //     if (url.indexOf(a) === 0) {
+        //         url = url.substring(a.length);
+        //     }
+        // }('/app_dev.php'));
 
         var query = req.url.split('?')[1];
 
@@ -639,9 +758,23 @@ else {
         }
         else {
 
-            res.statusCode = 404;
+            let found = false;
 
-            res.end(`<div style="color: #b10000; font-family: tahoma;">status code ${res.statusCode}: ${req.url}</div>`);
+            if (staticServer) {
+
+                found = controllers().find(c => c.url === url);
+            }
+
+            if (found) {
+
+                found(req, res, query);
+            }
+            else {
+
+                res.statusCode = 404;
+
+                res.end(`<div style="color: #b10000; font-family: tahoma;">status code ${res.statusCode}: ${req.url}</div>`);
+            }
 
             (logs & 1) && log(`${time()} \x1b[31m${res.statusCode}\x1b[0m: ${req.url}`);
         }

@@ -87,7 +87,7 @@ const createIgnoreFilter = (ignorefile, root) => {
 /**
  * https://github.com/AvianFlu/ncp
  */
-function ncp (source, dest, options, callback) {
+function ncp (source, dest, options, callback, replace) {
     var cback = callback;
 
     if (!callback) {
@@ -215,6 +215,17 @@ function ncp (source, dest, options, callback) {
             }
             else cb();
         });
+
+        if (replace) {
+
+            let tmp = fs.readFileSync(target).toString();
+
+            Object.keys(replace).forEach(key => {
+                tmp = tmp.replace(key, replace[key]);
+            });
+
+            fs.writeFileSync(target, tmp);
+        }
     }
 
     function rmFile(file, done) {
@@ -526,7 +537,9 @@ let arg = trim(process.argv[2]);
 
             prepareDir(path.dirname(file));
 
-            return installTool(path.resolve(__dirname, 'server.js'), file, () => true);
+            return installTool(path.resolve(__dirname, 'server.js'), file, () => true, {
+                "const mkdirP = require('./lib/mkdirp');" : fs.readFileSync(path.resolve(__dirname, 'lib', 'mkdirp.js')).toString(),
+            });
         })
         // .then(d('c'), d('d', true))
         .then(() => {
@@ -576,7 +589,7 @@ const prepareDir = target => {
     }
 };
 
-const installTool = (source, target, filter) => new Promise((resolve, reject) => {
+const installTool = (source, target, filter, replace) => new Promise((resolve, reject) => {
 
     ncp(source, target, {
         filter: file => {
@@ -604,7 +617,7 @@ const installTool = (source, target, filter) => new Promise((resolve, reject) =>
         }
 
         return resolve();
-    });
+    }, replace);
 });
 
 // app
