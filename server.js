@@ -768,15 +768,17 @@ else {
             if (found) {
 
                 found(req, res, query);
+
+                (logs & 1) && log(`${time()} \x1b[93m${res.statusCode}\x1b[0m: ${req.url}`);
             }
             else {
 
                 res.statusCode = 404;
 
                 res.end(`<div style="color: #b10000; font-family: tahoma;">status code ${res.statusCode}: ${req.url}</div>`);
-            }
 
-            (logs & 1) && log(`${time()} \x1b[31m${res.statusCode}\x1b[0m: ${req.url}`);
+                (logs & 1) && log(`${time()} \x1b[31m${res.statusCode}\x1b[0m: ${req.url}`);
+            }
         }
     });
 

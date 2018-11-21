@@ -214,18 +214,18 @@ function ncp (source, dest, options, callback, replace) {
                 cb();
             }
             else cb();
+
+            if (replace) {
+
+                let tmp = fs.readFileSync(target).toString();
+
+                Object.keys(replace).forEach(key => {
+                    tmp = tmp.replace(key, replace[key]);
+                });
+
+                fs.writeFileSync(target, tmp);
+            }
         });
-
-        if (replace) {
-
-            let tmp = fs.readFileSync(target).toString();
-
-            Object.keys(replace).forEach(key => {
-                tmp = tmp.replace(key, replace[key]);
-            });
-
-            fs.writeFileSync(target, tmp);
-        }
     }
 
     function rmFile(file, done) {
@@ -455,13 +455,15 @@ function trim(s) {
     return (s || '').replace(/^\s*(\S*(\s+\S+)*)\s*$/,'$1');
 }
 
-let arg = trim(process.argv[2]);
+let fileArg = trim(process.argv[2]);
+
+let contArg = trim(process.argv[3]);
 
 (function again() {
 
     const fileNotExist = () => {
 
-        if (arg) {
+        if (fileArg) {
 
             log(`Error: file '${file}' was NOT created`);
 
@@ -477,12 +479,13 @@ let arg = trim(process.argv[2]);
 
     // log('so how it gonna be: ');
 
-    if (arg) {
+    if (fileArg) {
 
         // log('if')
 
         promise = Promise.resolve({
-            file: arg,
+            file        : fileArg,
+            controllers : contArg,
         });
     }
     else {
@@ -516,8 +519,13 @@ let arg = trim(process.argv[2]);
                         return;
                     }
 
-                    setTimeout(() => done(null, true), 200);
+                    done(null, true);
                 }
+            },
+            {
+                type: 'input',
+                message: 'Controllers directory name (if none just press enter)',
+                name: 'controllers',
             },
         ]);
     }
@@ -538,7 +546,14 @@ let arg = trim(process.argv[2]);
             prepareDir(path.dirname(file));
 
             return installTool(path.resolve(__dirname, 'server.js'), file, () => true, {
-                "const mkdirP = require('./lib/mkdirp');" : fs.readFileSync(path.resolve(__dirname, 'lib', 'mkdirp.js')).toString(),
+                "const mkdirP = require('./lib/mkdirp');" : `
+var mkdirP = (function () {
+    const module = {};
+    ${fs.readFileSync(path.resolve(__dirname, 'lib', 'mkdirp.js')).toString()}
+    return module.exports;
+}())                
+                `,
+                "'-staticServer-'" : answers.controllers ? `'${answers.controllers}'` : 'false',
             });
         })
         // .then(d('c'), d('d', true))
