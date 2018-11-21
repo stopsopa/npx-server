@@ -10,3 +10,7 @@
     
     npx npx-server server.js
     
+    or
+    
+    npx npx-server [server_file_name.js] [controllers_directory]
+    
