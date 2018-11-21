@@ -1,6 +1,6 @@
 {
   "name": "npx-server",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "No dependency, single file/script http server",
   "main": "install.js",
   "scripts": {
