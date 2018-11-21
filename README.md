@@ -1,6 +1,6 @@
 [![npm version](https://badge.fury.io/js/npx-server.svg)](https://badge.fury.io/js/npx-server)
 
-[![npx-server youtube demo](http://img.youtube.com/vi/uAO9Buimxys/0.jpg)](http://www.youtube.com/watch?v=uAO9Buimxys)
+[![npx-server youtube demo](https://user-images.githubusercontent.com/3743506/48829880-40d84900-ed6b-11e8-8a9b-ff566f15d2a9.png)](http://www.youtube.com/watch?v=uAO9Buimxys)
 
 
 
