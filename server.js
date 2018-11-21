@@ -313,13 +313,29 @@ if (staticServer && gc) {
         process.exit(1);
     }
 
+    let checkPath = gc;
+
+    if (gc.indexOf('/') === 0) {
+
+        checkPath = checkPath.substring(1);
+    }
+
+    checkPath = path.resolve(__dirname, checkPath);
+
+    if (fs.existsSync(checkPath)) {
+
+        process.stdout.write(`Error:\n    Can't create controller '${checkPath}' path is already taken`);
+
+        process.exit(1);
+    }
+
     file = path.resolve(staticServerAbs, file);
 
     prepareDir(path.dirname(file));
 
     if (fs.existsSync(file)) {
 
-        process.stdout.write(`Error: Controller '${file}' already exist`);
+        process.stdout.write(`Error:\n    Controller '${file}' already exist`);
 
         process.exit(1);
     }
@@ -347,7 +363,7 @@ module.exports = controller;
     }
     else {
 
-        process.stdout.write(`Error: Controller '${file}' couldn't be created`);
+        process.stdout.write(`Error:\n    Controller '${file}' couldn't be created`);
 
         process.exit(1);
     }
