@@ -686,7 +686,7 @@ else {
 
         if (req.url === '/favicon.ico') {
 
-            (logs & 4) && log(`${time()} \x1b[33m${res.statusCode}\x1b[0m: ${url} -> ${url + '/'}`);
+            (logs & 4) && log(`${time()} \x1b[33m${res.statusCode}\x1b[0m: ${url}`);
 
             res.statusCode = 200;
             res.setHeader('Content-Type', 'image/x-icon');
