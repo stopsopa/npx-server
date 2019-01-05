@@ -354,7 +354,8 @@ const controller = (req, res, query = {}) => {
     res.end(JSON.stringify({
         page: {
             query,
-        }
+        },
+        node: process.version,
     }));
 }
 
