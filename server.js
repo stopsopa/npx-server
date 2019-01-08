@@ -344,16 +344,17 @@ if (staticServer && gc) {
     
 // https://nodejs.org/api/http.html#http_class_http_serverresponse
     
-const controller = (req, res, query = {}) => {
+const controller = (req, res, query = {}, json = {}) => {
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     // res.setHeader('Content-Type', 'text/plain; charset=utf-8');
 
-    res.statusCode = 404;
+    // res.statusCode = 404;
 
     res.end(JSON.stringify({
         page: {
             query,
+            json,
         },
         node: process.version,
     }));
@@ -828,7 +829,26 @@ else {
 
             if (found) {
 
-                found(req, res, query);
+
+                let json='';
+                req.setEncoding('utf8');
+                req.on('data', function(chunk) {
+                    json += chunk;
+                });
+
+                req.on('end', function() {
+
+                    try {
+
+                        json = JSON.parse(json);
+
+                    } catch (e) {
+
+                        json = e;
+                    }
+
+                    found(req, res, query, json);
+                });
 
                 (logs & 1) && log(`${time()} \x1b[93m${res.statusCode}\x1b[0m: ${req.url}`);
             }
