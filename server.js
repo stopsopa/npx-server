@@ -664,14 +664,17 @@ else {
 
             const dir = path.resolve(__dirname, staticServer);
 
-            return fs.readdirSync(dir).map(file => {
 
-                const lib = path.resolve(dir, file);
+            return fs.readdirSync(dir)
+                .filter(file => path.extname(file) === '.js')
+                .map(file => {
 
-                delete require.cache[lib];
+                    const lib = path.resolve(dir, file);
 
-                return require(lib);
-            });
+                    delete require.cache[lib];
+
+                    return require(lib);
+                });
         }
         catch (e) {
 
