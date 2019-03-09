@@ -660,26 +660,34 @@ else {
 
     const controllers = () => {
 
-        try {
+        const dir = path.resolve(__dirname, staticServer);
 
-            const dir = path.resolve(__dirname, staticServer);
+        return fs.readdirSync(dir)
+            .reduce((acc, file) => {
 
+                const lib = path.resolve(dir, file);
 
-            return fs.readdirSync(dir)
-                .filter(file => path.extname(file) === '.js')
-                .map(file => {
+                try {
 
-                    const lib = path.resolve(dir, file);
+                    const ext = path.extname(file);
+
+                    if (ext !== '.js') {
+
+                        return acc;
+                    };
 
                     delete require.cache[lib];
 
-                    return require(lib);
-                });
-        }
-        catch (e) {
+                    acc.push(require(lib));
+                }
+                catch (e) {
 
-            return [];
-        }
+                    log(`controllers error [${lib}]: `, e)
+                }
+
+                return acc;
+            }, [])
+        ;
     }
 
     // base64 online encoder: https://xaviesteve.com//pro/base64.php
