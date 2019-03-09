@@ -678,7 +678,11 @@ else {
 
                     delete require.cache[lib];
 
-                    acc.push(require(lib));
+                    const module = require(lib);
+
+                    module.__file = lib;
+
+                    acc.push(module);
                 }
                 catch (e) {
 
@@ -858,7 +862,24 @@ else {
                         json = e;
                     }
 
-                    found(req, res, query, json);
+                    try {
+
+                        found(req, res, query, json);
+                    }
+                    catch (e) {
+
+                        res.setHeader(`Content-Type`, `application/json; charset=utf-8`);
+
+                        res.statusCode = 500;
+
+                        res.end(JSON.stringify({
+                            exception: 'General controller exception',
+                            controller: found.__file,
+                            exceptionMessage: e.message,
+                            exceptionMessageSplit: (e.message + '').split("\n")
+                        }));
+                    }
+
                 });
 
                 (logs & 1) && log(`${time()} \x1b[93m${res.statusCode}\x1b[0m: ${req.url}`);
