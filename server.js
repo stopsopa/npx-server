@@ -662,6 +662,11 @@ else {
 
         const dir = path.resolve(__dirname, staticServer);
 
+        if ( ! fs.existsSync(dir) ) {
+
+            return [];
+        }
+
         return fs.readdirSync(dir)
             .reduce((acc, file) => {
 
