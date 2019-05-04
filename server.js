@@ -28,6 +28,15 @@ if (staticServer) {
     staticServerAbs = path.resolve(__dirname, staticServer);
 }
 
+process.on('SIGINT', function (signal) {
+    console.log(`signal SIGINT..., signal: ${signal}`)
+    process.exit(0);
+});
+process.on('SIGTERM', function (signal) {
+    console.log(`signal SIGTERM..., signal: ${signal}`)
+    process.exit(0);
+});
+
 const log = function () {
     Array.prototype.slice.call(arguments).map(i => i + "\n").forEach(i => process.stdout.write(i));
 };
