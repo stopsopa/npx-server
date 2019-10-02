@@ -329,7 +329,7 @@ if (staticServer && gc) {
         checkPath = checkPath.substring(1);
     }
 
-    checkPath = path.resolve(__dirname, checkPath);
+    checkPath = path.resolve(staticServerAbs, checkPath);
 
     if (fs.existsSync(checkPath)) {
 
