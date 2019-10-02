@@ -353,7 +353,13 @@ if (staticServer && gc) {
     
 // https://nodejs.org/api/http.html#http_class_http_serverresponse
     
-const controller = (req, res, query = {}, json = {}, raw) => {
+const controller = ({
+    req, 
+    res, 
+    query   = {}, 
+    json    = {}, 
+    raw
+}) => {
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     // res.setHeader('Content-Type', 'text/plain; charset=utf-8');
@@ -365,8 +371,13 @@ const controller = (req, res, query = {}, json = {}, raw) => {
             query,
             json,
         },
+        raw,
         node: process.version,
     }));
+    
+    // redirect
+    // res.writeHead(302, { "Location": "/index.html?error" });
+    // return res.end('');
 }
 
 controller.url = '${gc}';
@@ -880,7 +891,7 @@ else {
 
                     try {
 
-                        found(req, res, query, json, raw);
+                        found({ req, res, query, json, raw });
                     }
                     catch (e) {
 
