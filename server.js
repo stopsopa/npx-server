@@ -353,7 +353,7 @@ if (staticServer && gc) {
     
 // https://nodejs.org/api/http.html#http_class_http_serverresponse
     
-const controller = ({
+const controller = async ({
     req, 
     res, 
     query   = {}, 
@@ -361,23 +361,34 @@ const controller = ({
     raw
 }) => {
 
-    res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    // res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    try {
 
-    // res.statusCode = 404;
-
-    res.end(JSON.stringify({
-        page: {
-            query,
-            json,
-        },
-        raw,
-        node: process.version,
-    }));
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        // res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     
-    // redirect
-    // res.writeHead(302, { "Location": "/index.html?error" });
-    // return res.end('');
+        // res.statusCode = 404;
+    
+        res.end(JSON.stringify({
+            page: {
+                query,
+                json,
+            },
+            raw,
+            node: process.version,
+        }));
+        
+        // redirect
+        // res.writeHead(302, { "Location": "/index.html?error" });
+        // return res.end('');
+    }
+    catch (e) {
+    
+        console.log(\`$\{controller.url\} error: ${e}\`);
+        
+        res.statusCode = 500;
+        
+        res.end(\`Server error\`);
+    }
 }
 
 controller.url = '${gc}';
