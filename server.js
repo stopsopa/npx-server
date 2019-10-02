@@ -353,7 +353,7 @@ if (staticServer && gc) {
     
 // https://nodejs.org/api/http.html#http_class_http_serverresponse
     
-const controller = (req, res, query = {}, json = {}) => {
+const controller = (req, res, query = {}, json = {}, raw) => {
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     // res.setHeader('Content-Type', 'text/plain; charset=utf-8');
@@ -867,6 +867,8 @@ else {
 
                 req.on('end', function() {
 
+                    const raw = json;
+
                     try {
 
                         json = JSON.parse(json);
@@ -878,7 +880,7 @@ else {
 
                     try {
 
-                        found(req, res, query, json);
+                        found(req, res, query, json, raw);
                     }
                     catch (e) {
 
