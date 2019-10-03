@@ -18,6 +18,16 @@ var script    = 'node ' + thisScript;
 
 var sp = ['node', [thisScript]];
 
+var etag=function(){
+    /*!
+         * etag
+         * Copyright(c) 2014-2016 Douglas Christopher Wilson
+         * MIT Licensed
+         * https://github.com/jshttp/etag/blob/v1.8.1/index.js
+         */
+    "use strict";var t=require("crypto"),e=require("fs").Stats,r=Object.prototype.toString;return function(n,i){if(null==n)throw new TypeError("argument entity is required");var o=(u=n,"function"==typeof e&&u instanceof e||u&&"object"==typeof u&&"ctime"in u&&"[object Date]"===r.call(u.ctime)&&"mtime"in u&&"[object Date]"===r.call(u.mtime)&&"ino"in u&&"number"==typeof u.ino&&"size"in u&&"number"==typeof u.size),f=i&&"boolean"==typeof i.weak?i.weak:o;var u;if(!o&&"string"!=typeof n&&!Buffer.isBuffer(n))throw new TypeError("argument entity must be string, Buffer, or fs.Stats");var a,s,c=o?(s=(a=n).mtime.getTime().toString(16),'"'+a.size.toString(16)+"-"+s+'"'):function(e){if(0===e.length)return'"0-2jmj7l5rSw0yVb/vlWAYkK/YBwk"';var r=t.createHash("sha1").update(e,"utf8").digest("base64").substring(0,27);return'"'+("string"==typeof e?Buffer.byteLength(e,"utf8"):e.length).toString(16)+"-"+r+'"'}(n);return f?"W/"+c:c}}();
+
+
 var staticServer = '-staticServer-';
 // var staticServer = false;
 
@@ -253,6 +263,8 @@ parameters:
     --dir [path]                def: '.' 
         relative or absolute path to directory with files to serve
         
+    --cache [sec]               60 * 60 * 24 * 365  = 31,536,000
+        
     --config [filepath.json]    def: false
     
         path to config file (json format), file can containe object where 
@@ -444,7 +456,7 @@ const diff = function(a, b) {
 
         process.exit(1);
     }
-}(diff(Object.keys(args.all()), ('port dir noindex log help watch ignore inject debug config dump flag' + (staticServer ? ' gc' : '')).split(' '))));
+}(diff(Object.keys(args.all()), ('port dir noindex log help watch ignore inject debug config dump flag cache' + (staticServer ? ' gc' : '')).split(' '))));
 
 function execArgs (args, str) {
     var arr = ['--inject'];
@@ -479,6 +491,18 @@ function execArgs (args, str) {
 }
 
 var dir     = path.resolve(__dirname, args.get('dir', '.'));
+
+var cache   = args.get('cache', false);
+
+if (cache) {
+
+    cache = parseInt(cache, 10);
+}
+
+if ( cache < 1 ) {
+
+    cache = false;
+}
 
 var regexps = (function () {
     function split(reg) {
@@ -860,7 +884,26 @@ else {
 
             try {
 
-                res.end(addWatcher(fs.readFileSync(file), type(req, res)));
+                const content = fs.readFileSync(file);
+
+                if (cache) {
+
+                    // Cache-Control: public, max-age=30758400
+                    res.setHeader(`Cache-Control`, `public, max-age=${cache}`);
+
+                    // ETag: W/"41981-16316f3a346"
+                    // res.setHeader(`ETag`, `public, max-age=${cache}`);
+                    res.setHeader(`ETag`, etag(content, {
+                        weak: true
+                    })); // 60 * 60 * 24 * 365  = 31,536,000
+
+                    // Last-Modified: Mon, 30 Apr 2018 14:27:35 GMT
+                    var stats = fs.statSync(file);
+                    var mtime = stats.mtime;
+                    res.setHeader(`Last-Modified`, mtime.toUTCString());
+                }
+
+                res.end(addWatcher(content, type(req, res)));
             }
             catch (e) {
 
