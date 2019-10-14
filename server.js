@@ -671,6 +671,7 @@ else {
         jpg     : 'image/jpeg',
         png     : 'image/png',
         pdf     : 'application/pdf',
+        svg     : 'image/svg+xml',
         ico     : 'image/x-icon',
     }))));
 
