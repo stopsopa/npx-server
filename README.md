@@ -27,7 +27,4 @@ It's just simple HTTP server with
     
     npx npx-server [server_file_name.js] [controllers_directory]
     
-    or
-    
-    npx npx-server --ignore-existing
     
