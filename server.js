@@ -811,7 +811,11 @@ else {
                     key     = a.shift(),
                     dec     = a.join('=')
                 ;
-                acc[key] = decodeURIComponent(dec);
+                if (key) {
+
+                    acc[key] = decodeURIComponent(dec);
+                }
+                
                 return acc;
             }, {});
 
