@@ -8,6 +8,8 @@ var http        = require('http');
 
 var path        = require('path');
 
+var os          = require('os');
+
 var fs          = require('fs');
 
 const spawn      = require('child_process').spawn;
@@ -289,6 +291,10 @@ parameters:
                 7 - show all without autoindex
                 15 - show all
                 
+    --host
+        
+        show on top of the page hostname
+                
     --watch [regex]            def: false
     
         reload currently opened page in browser when files will change
@@ -456,7 +462,7 @@ const diff = function(a, b) {
 
         process.exit(1);
     }
-}(diff(Object.keys(args.all()), ('port dir noindex log help watch ignore inject debug config dump flag cache' + (staticServer ? ' gc' : '')).split(' '))));
+}(diff(Object.keys(args.all()), ('port dir noindex log help watch ignore host inject debug config dump flag cache' + (staticServer ? ' gc' : '')).split(' '))));
 
 function execArgs (args, str) {
     var arr = ['--inject'];
@@ -815,7 +821,7 @@ else {
 
                     acc[key] = decodeURIComponent(dec);
                 }
-                
+
                 return acc;
             }, {});
 
@@ -851,6 +857,13 @@ else {
 
                 try {
 
+                    var host = '';
+
+                    if (args.get('host')) {
+
+                        host = `<p>hostname: ${os.hostname()}</p><hr>`
+                    }
+
                     var list = `
 <!doctype html>
 <html lang="en">
@@ -866,6 +879,7 @@ else {
         a{padding-right:20px;padding-left:3px;margin-left:3px;border-left:1px solid transparent}
         a:hover{border-left:1px solid gray}
     </style>
+    ${host}
     <ul><li>📁<a href=".."> .. </a></li>
 </body>
 </html>
