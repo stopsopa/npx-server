@@ -9,5 +9,5 @@ COPY lib/mkdirp.js ./lib/mkdirp.js
 
 EXPOSE 80
 
-CMD [ "node", "server.js", "--port", "80", "--host" ]
+CMD [ "node", "server.js", "--port", "80", "--info" ]
 

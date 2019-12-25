@@ -861,7 +861,47 @@ else {
 
                     if (args.get('info')) {
 
-                        info = `<p>hostname: ${os.hostname()}, node: ${process.version}</p><hr>`
+                        info = `
+<style>
+    .env-p {
+        
+    }
+    .env-c {
+        display: none;
+        position: absolute; 
+        top: 44px; 
+        left: 10px; 
+        border: 1px solid gray; 
+        background-color: white; 
+        padding: 5px;
+        max-height: 80%;
+        min-width: 30%;
+        overflow-y: scroll;
+    }
+    .env-c pre {
+        margin: 0;
+        font-size: 16px;
+        font-family: monospace;
+    }
+    .env-c.visible {
+        display: inline-block;
+    }
+</style>
+<script>
+    var log = (function(){try{return console.log}catch(e){return function(){}}}());
+    document.addEventListener('DOMContentLoaded', function () {
+       var p = document.querySelector('.env-p'); 
+       var c = document.querySelector('.env-c');
+       p.addEventListener('click', function () {
+           c.classList.toggle("visible");
+       });
+    });
+</script>
+<button class="env-p" onClick=>ENV</button>
+<div class="env-c"><pre>${JSON.stringify(process.env, null, 4)}</pre></div>
+hostname: ${os.hostname()}, node: ${process.version}
+<hr>
+`
                     }
 
                     var list = `
