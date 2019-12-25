@@ -291,9 +291,9 @@ parameters:
                 7 - show all without autoindex
                 15 - show all
                 
-    --host
+    --info
         
-        show on top of the page hostname
+        show on top of the page hostname, node version and others
                 
     --watch [regex]            def: false
     
@@ -462,7 +462,7 @@ const diff = function(a, b) {
 
         process.exit(1);
     }
-}(diff(Object.keys(args.all()), ('port dir noindex log help watch ignore host inject debug config dump flag cache' + (staticServer ? ' gc' : '')).split(' '))));
+}(diff(Object.keys(args.all()), ('port dir noindex log help watch ignore info inject debug config dump flag cache' + (staticServer ? ' gc' : '')).split(' '))));
 
 function execArgs (args, str) {
     var arr = ['--inject'];
@@ -762,7 +762,7 @@ else {
     }
 
     // base64 online encoder: https://xaviesteve.com//pro/base64.php
-    const favicon = new Buffer('iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAFdQTFRF/////v7+7e3t4+Pj4uLi7u7urKysSEhINjY2SUlJtLS0GhoaMzMzysrK5OTkODg4S0tLHR0duLi4MjIySkpK5eXl7+/vHBwc8/PzbGxsNTU18fHx7u/vzVzHUQAAAAFiS0dEAIgFHUgAAAAJcEhZcwAAFiUAABYlAUlSJPAAAADdSURBVDjLnZPZEoMgDEWBQAVF0Nq9/f/vbBAXNnXa++KMOQPJMRIShi4h8XsGLlxQj5AUOFVyjKpJMaxqtKvrRrEiAFK3BsC0WsIG4Avz8x/g4AqhsElrsclO5FU3ca2k7nstu3Oh7JxQhsfjNYKWgKjRySks6GJ1AjKnCSAypwGAPZh2SAZePxxYnAJnsbGyX4DDK3yTl7nJySlNPaDTMbPTDKDCXDHmFojaBbITCiajpRHb27kxZgjcS6LWPJ4vuQuQN7ijh4Pt/KQms6Qms/WljHPuf+O8XvjtMV9rxg4RtlXOXgAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOC0xMS0yN1QxMDowMzowMSswMDowMIg1+6IAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTgtMTEtMjdUMTA6MDM6MDErMDA6MDD5aEMeAAAARnRFWHRzb2Z0d2FyZQBJbWFnZU1hZ2ljayA2LjcuOC05IDIwMTQtMDUtMTIgUTE2IGh0dHA6Ly93d3cuaW1hZ2VtYWdpY2sub3Jn3IbtAAAAABh0RVh0VGh1bWI6OkRvY3VtZW50OjpQYWdlcwAxp/+7LwAAABh0RVh0VGh1bWI6OkltYWdlOjpoZWlnaHQAMTkyDwByhQAAABd0RVh0VGh1bWI6OkltYWdlOjpXaWR0aAAxOTLTrCEIAAAAGXRFWHRUaHVtYjo6TWltZXR5cGUAaW1hZ2UvcG5nP7JWTgAAABd0RVh0VGh1bWI6Ok1UaW1lADE1NDMzMTI5ODEv0kVFAAAAD3RFWHRUaHVtYjo6U2l6ZQAwQkKUoj7sAAAAVnRFWHRUaHVtYjo6VVJJAGZpbGU6Ly8vbW50bG9nL2Zhdmljb25zLzIwMTgtMTEtMjcvNzMzODU0Y2FjM2I1MGI4NGE3NmIwODY1MmY4NDdjYjQuaWNvLnBuZwnzw3IAAAAASUVORK5CYII=', 'base64');
+    const favicon = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAFdQTFRF/////v7+7e3t4+Pj4uLi7u7urKysSEhINjY2SUlJtLS0GhoaMzMzysrK5OTkODg4S0tLHR0duLi4MjIySkpK5eXl7+/vHBwc8/PzbGxsNTU18fHx7u/vzVzHUQAAAAFiS0dEAIgFHUgAAAAJcEhZcwAAFiUAABYlAUlSJPAAAADdSURBVDjLnZPZEoMgDEWBQAVF0Nq9/f/vbBAXNnXa++KMOQPJMRIShi4h8XsGLlxQj5AUOFVyjKpJMaxqtKvrRrEiAFK3BsC0WsIG4Avz8x/g4AqhsElrsclO5FU3ca2k7nstu3Oh7JxQhsfjNYKWgKjRySks6GJ1AjKnCSAypwGAPZh2SAZePxxYnAJnsbGyX4DDK3yTl7nJySlNPaDTMbPTDKDCXDHmFojaBbITCiajpRHb27kxZgjcS6LWPJ4vuQuQN7ijh4Pt/KQms6Qms/WljHPuf+O8XvjtMV9rxg4RtlXOXgAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOC0xMS0yN1QxMDowMzowMSswMDowMIg1+6IAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTgtMTEtMjdUMTA6MDM6MDErMDA6MDD5aEMeAAAARnRFWHRzb2Z0d2FyZQBJbWFnZU1hZ2ljayA2LjcuOC05IDIwMTQtMDUtMTIgUTE2IGh0dHA6Ly93d3cuaW1hZ2VtYWdpY2sub3Jn3IbtAAAAABh0RVh0VGh1bWI6OkRvY3VtZW50OjpQYWdlcwAxp/+7LwAAABh0RVh0VGh1bWI6OkltYWdlOjpoZWlnaHQAMTkyDwByhQAAABd0RVh0VGh1bWI6OkltYWdlOjpXaWR0aAAxOTLTrCEIAAAAGXRFWHRUaHVtYjo6TWltZXR5cGUAaW1hZ2UvcG5nP7JWTgAAABd0RVh0VGh1bWI6Ok1UaW1lADE1NDMzMTI5ODEv0kVFAAAAD3RFWHRUaHVtYjo6U2l6ZQAwQkKUoj7sAAAAVnRFWHRUaHVtYjo6VVJJAGZpbGU6Ly8vbW50bG9nL2Zhdmljb25zLzIwMTgtMTEtMjcvNzMzODU0Y2FjM2I1MGI4NGE3NmIwODY1MmY4NDdjYjQuaWNvLnBuZwnzw3IAAAAASUVORK5CYII=', 'base64');
 
     server.on('request', function (req, res) {
 
@@ -857,11 +857,11 @@ else {
 
                 try {
 
-                    var host = '';
+                    var info = '';
 
-                    if (args.get('host')) {
+                    if (args.get('info')) {
 
-                        host = `<p>hostname: ${os.hostname()}</p><hr>`
+                        info = `<p>hostname: ${os.hostname()}, node: ${process.version}</p><hr>`
                     }
 
                     var list = `
@@ -879,7 +879,7 @@ else {
         a{padding-right:20px;padding-left:3px;margin-left:3px;border-left:1px solid transparent}
         a:hover{border-left:1px solid gray}
     </style>
-    ${host}
+    ${info}
     <ul><li>📁<a href=".."> .. </a></li>
 </body>
 </html>
