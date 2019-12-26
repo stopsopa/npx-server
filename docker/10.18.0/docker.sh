@@ -33,7 +33,7 @@ COPY lib/mkdirp.js ./lib/mkdirp.js
 
 EXPOSE 80
 
-CMD [ "node", "server.js", "--port", "80", "--info" ]
+CMD [ "node", "server.js", "--port", "80", "--info", "--edit" ]
 
 EOF
 

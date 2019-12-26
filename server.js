@@ -197,6 +197,8 @@ const args = (function (obj, tmp) {
     };
 }({}));
 
+const edit = args.get('edit')
+
 // const config = {/*  */}
 // const log = console.log;
 
@@ -294,6 +296,10 @@ parameters:
     --info
         
         show on top of the page hostname, node version and others
+        
+    --edit
+    
+        provide simple files manipulation tools
                 
     --watch [regex]            def: false
     
@@ -383,6 +389,8 @@ const controller = async ({
 
         res.setHeader('Content-Type', 'application/json; charset=utf-8');
         // res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        
+        // req.method === 'POST'
     
         // res.statusCode = 404;
     
@@ -401,7 +409,7 @@ const controller = async ({
     }
     catch (e) {
     
-        console.log(\`$\{controller.url\} error: ${e}\`);
+        console.log(\`$\{controller.url\} error: $\{e}\`);
         
         res.statusCode = 500;
         
@@ -462,7 +470,7 @@ const diff = function(a, b) {
 
         process.exit(1);
     }
-}(diff(Object.keys(args.all()), ('port dir noindex log help watch ignore info inject debug config dump flag cache' + (staticServer ? ' gc' : '')).split(' '))));
+}(diff(Object.keys(args.all()), ('port dir noindex log help watch ignore info edit inject debug config dump flag cache' + (staticServer ? ' gc' : '')).split(' '))));
 
 function execArgs (args, str) {
     var arr = ['--inject'];
@@ -768,7 +776,7 @@ else {
 
         var url = req.url.split('?')[0];
 
-        if (req.url === '/favicon.ico') {
+        if (url === '/favicon.ico') {
 
             (logs & 4) && log(`${time()} \x1b[33m${res.statusCode}\x1b[0m: ${url}`);
 
@@ -779,7 +787,7 @@ else {
             return res.end(favicon);
         }
 
-        if (req.url === '/run-sandbox-server.sh-check') {
+        if (url === '/run-sandbox-server.sh-check') {
 
             res.statusCode = 201;
 
@@ -863,9 +871,6 @@ else {
 
                         info = `
 <style>
-    .env-p {
-        
-    }
     .env-c {
         display: none;
         position: absolute; 
@@ -982,7 +987,6 @@ hostname: ${os.hostname()}, node: ${process.version}
 
             if (found) {
 
-
                 let json='';
                 req.setEncoding('utf8');
                 req.on('data', function(chunk) {
@@ -1019,18 +1023,73 @@ hostname: ${os.hostname()}, node: ${process.version}
                             exceptionMessageSplit: (e.message + '').split("\n")
                         }));
                     }
-
                 });
 
                 (logs & 1) && log(`${time()} \x1b[93m${res.statusCode}\x1b[0m: ${req.url}`);
             }
             else {
 
-                res.statusCode = 404;
 
-                res.end(`<div style="color: #b10000; font-family: tahoma;">status code ${res.statusCode}: ${req.url}</div>`);
+                if (edit && url === '/__create.edit') {
 
-                (logs & 1) && log(`${time()} \x1b[31m${res.statusCode}\x1b[0m: ${req.url}`);
+                    let json='';
+                    req.setEncoding('utf8');
+                    req.on('data', function(chunk) {
+                        json += chunk;
+                    });
+
+                    req.on('end', function() {
+
+                        const raw = json;
+
+                        try {
+
+                            json = JSON.parse(json);
+
+                        } catch (e) {
+
+                            json = e;
+                        }
+
+                        const method = req.method;
+
+                        try {
+
+                            res.setHeader('Content-Type', 'application/json; charset=utf-8');
+                            //
+                            // res.statusCode = 201;
+
+                            return res.end(JSON.stringify({
+                                method,
+                                json,
+                                query,
+                            }, null, 4));
+                        }
+                        catch (e) {
+
+                            res.setHeader(`Content-Type`, `application/json; charset=utf-8`);
+
+                            res.statusCode = 500;
+
+                            return res.end(JSON.stringify({
+                                exception: 'edit endpoint',
+                                method,
+                                exceptionMessage: e.message,
+                                exceptionMessageSplit: (e.message + '').split("\n")
+                            }));
+                        }
+                    });
+
+                    (logs & 1) && log(`${time()} \x1b[93m${res.statusCode}\x1b[0m: ${req.url}`);
+                }
+                else {
+
+                    res.statusCode = 404;
+
+                    res.end(`<div style="color: #b10000; font-family: tahoma;">status code ${res.statusCode}: ${req.url}</div>`);
+
+                    (logs & 1) && log(`${time()} \x1b[31m${res.statusCode}\x1b[0m: ${req.url}`);
+                }
             }
         }
     });
