@@ -1163,7 +1163,7 @@ hostname: ${os.hostname()}, node: ${process.version}
 
                     if (req.method === 'DELETE') {
 
-                        log(`${time()} DELETE: \x1b[33mDoesn't exist\x1b[0m: ${file}`);
+                        log(`${time()} DELETE: \x1b[31mDoesn't exist\x1b[0m: ${file}`);
 
                         return restError(req, res,'DELETE', `Can't delete '${file}' because it doesn't exist`);
                     }
