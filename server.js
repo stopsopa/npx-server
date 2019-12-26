@@ -884,6 +884,11 @@ else {
                 //     body: JSON.stringify({post: 'dwa'})
                 // }).then(req => req.json()).then(json => console.log(json))
 
+                if (req.method === 'POST') {
+
+                    return restError(req, res, 'POST',`Can't create file '${file}' because it already exist`);
+                }
+
                 if (req.method === 'PUT') {
 
                     // fetch('/file.txt', {
@@ -1178,12 +1183,81 @@ hostname: ${os.hostname()}, node: ${process.version}
                                 json = e;
                             }
 
+                            if (json.dir) {
+
+                                // fetch('/dire/ctory', {
+                                //     method: 'post',
+                                //     body: JSON.stringify({dir: true})
+                                // }).then(req => req.json()).then(json => console.log(json))
+
+                                log(`${time()} POST (CREATE): dir mode: ${file}`);
+
+                                try {
+
+                                    mkdirP.sync(file);
+
+                                    if ( ! fs.existsSync(file) ) {
+
+                                        return restError(req, res, 'POST', `Can't create directory '${file}', unknown reason`);
+                                    }
+
+                                    var isDir = fs.statSync(file).isDirectory();
+
+                                    if ( ! isDir ) {
+
+                                        return restError(req, res, 'POST', `Path '${file}' is not a directory`);
+                                    }
+
+                                    res.setHeader(`Content-Type`, `application/json; charset=utf-8`);
+
+                                    res.statusCode = 500;
+
+                                    return res.end(JSON.stringify({
+                                        post: true,
+                                        dirMode: true,
+                                    }));
+                                }
+                                catch (e) {
+
+                                    return restError(req, res, 'POST', `Can't create directory '${file}', reason: ${e}`);
+                                }
+                            }
+
                             try {
 
-                                llog.dump({
-                                    post: url,
-                                    file,
-                                })
+                                const dir = path.dirname(file);
+
+                                prepareDir(dir);
+
+                                if ( ! fs.existsSync(dir) ) {
+
+                                    return restError(req, res, 'POST', `Can't create directory '${dir}' - POST create file mode, ${file}`);
+                                }
+
+                                var isDir = fs.statSync(dir).isDirectory();
+
+                                if ( ! isDir ) {
+
+                                    return restError(req, res, 'POST', `Path '${file}' is not a directory 2`);
+                                }
+
+                                if ( fs.existsSync(file) ) {
+
+                                    return restError(req, res, 'POST', `Path '${file}' already exist`);
+                                }
+
+                                fs.appendFileSync(file, json.data || '');
+
+                                if ( ! fs.existsSync(file) ) {
+
+                                    return restError(req, res, 'POST',`can't create file '${file}'`);
+                                }
+
+                                res.setHeader(`Content-Type`, `application/json; charset=utf-8`);
+
+                                return res.end(JSON.stringify({
+                                    post: true,
+                                }));
                             }
                             catch (e) {
 
@@ -1192,7 +1266,8 @@ hostname: ${os.hostname()}, node: ${process.version}
                                 res.statusCode = 500;
 
                                 return res.end(JSON.stringify({
-                                    exception: 'edit endpoint',
+                                    post: true,
+                                    dirMode: false,
                                     url,
                                     json,
                                     query,
