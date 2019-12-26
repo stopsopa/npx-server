@@ -804,6 +804,8 @@ else {
 
     server.on('request', function (req, res) {
 
+        var method = req.method.toUpperCase();
+
         var url = req.url.split('?')[0];
 
         if (url === '/favicon.ico') {
@@ -884,14 +886,88 @@ else {
                 //     body: JSON.stringify({post: 'dwa'})
                 // }).then(req => req.json()).then(json => console.log(json))
 
-                if (req.method === 'POST') {
+                if (method === 'PATCH') {
+
+                    let json='';
+                    req.setEncoding('utf8');
+                    req.on('data', function(chunk) {
+                        json += chunk;
+                    });
+
+                    return req.on('end', function() {
+
+                        try {
+
+                            json = JSON.parse(json);
+
+                        } catch (e) {
+
+                            json = e;
+                        }
+
+                        if ( typeof json.new !== 'string' ) {
+
+                            log(`${time()} PATCH (RENAME): \x1b[31mCan't rename\x1b[0m ${file}`);
+
+                            return restError(req, res,'PATCH', `Can't rename '${file}' because new name was not given`);
+                        }
+
+                        try {
+
+                            var n = path.resolve(dir, '.' + path.sep + (decodeURI(json.new).replace(/\.\.+/g, '.')));
+
+                            log(`${time()} PATCH (RENAME): ${file} -> ${n}`);
+
+                            if ( fs.existsSync(n) ) {
+
+                                return restError(req, res,'PATCH', `Can't rename '${file}' to ${n} because under new name already exist something`);
+                            }
+
+                            prepareDir(path.dirname(n));
+
+                            if ( ! fs.existsSync(dir) ) {
+
+                                return restError(req, res, 'POST', `Can't create directory '${dir}' - POST create file mode, ${file}`);
+                            }
+
+                            fs.renameSync(file, n);
+
+                            if ( ! fs.existsSync(n) ) {
+
+                                return restError(req, res,'PATCH', `Renaming '${file}' to ${n} failed`);
+                            }
+
+                            res.setHeader(`Content-Type`, `application/json; charset=utf-8`);
+
+                            return res.end(JSON.stringify({
+                                patch: true,
+                            }));
+                        }
+                        catch (e) {
+
+                            res.setHeader(`Content-Type`, `application/json; charset=utf-8`);
+
+                            res.statusCode = 500;
+
+                            res.end(JSON.stringify({
+                                exception: 'PATCH error',
+                                file,
+                                json,
+                                exceptionMessage: e.message,
+                                exceptionMessageSplit: (e.message + '').split("\n")
+                            }));
+                        }
+                    });
+                }
+
+                if (method === 'POST') {
 
                     log(`${time()} POST (CREATE): \x1b[31mCan't create\x1b[0m: ${file}`);
 
                     return restError(req, res, 'POST',`Can't create file '${file}' because it already exist`);
                 }
 
-                if (req.method === 'PUT') {
+                if (method === 'PUT') {
 
                     // fetch('/file.txt', {
                     //     method: 'put',
@@ -963,7 +1039,7 @@ else {
                     });
                 }
 
-                if (req.method === 'DELETE') {
+                if (method === 'DELETE') {
 
                     log(`${time()} DELETE: ${file}`);
 
@@ -1161,28 +1237,28 @@ hostname: ${os.hostname()}, node: ${process.version}
 
                 if (edit) {
 
-                    if (req.method === 'DELETE') {
+                    if (method === 'DELETE') {
 
                         log(`${time()} DELETE: \x1b[31mDoesn't exist\x1b[0m: ${file}`);
 
                         return restError(req, res,'DELETE', `Can't delete '${file}' because it doesn't exist`);
                     }
 
-                    if (req.method === 'PATCH') {
+                    if (method === 'PATCH') {
 
                         log(`${time()} PATCH (RENAME): \x1b[31mDoesn't exist\x1b[0m: ${file}`);
 
                         return restError(req, res,'PATCH', `Can't rename '${file}' because it doesn't exist`);
                     }
 
-                    if (req.method === 'PUT') {
+                    if (method === 'PUT') {
 
                         log(`${time()} PUT (EDIT): \x1b[31mCan't update\x1b[0m: ${file}`);
 
                         return restError(req, res,'PUT', `Can't update '${file}' because it doesn't exist`);
                     }
 
-                    if (req.method === 'POST') {
+                    if (method === 'POST') {
 
                         let json='';
                         req.setEncoding('utf8');
@@ -1294,7 +1370,7 @@ hostname: ${os.hostname()}, node: ${process.version}
                                     url,
                                     json,
                                     query,
-                                    method: req.method,
+                                    method,
                                     exceptionMessage: e.message,
                                     exceptionMessageSplit: (e.message + '').split("\n")
                                 }));
@@ -1311,7 +1387,7 @@ hostname: ${os.hostname()}, node: ${process.version}
                     return res.end(JSON.stringify({
                         exception: 'edit endpoint',
                         query,
-                        method: req.method,
+                        method,
                         error: 'unknown method',
                     }));
                 }
