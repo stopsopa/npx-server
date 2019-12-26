@@ -1225,6 +1225,11 @@ hostname: ${os.hostname()}, node: ${process.version}
 
                             try {
 
+                                // fetch('/dire/ctory/a/b/c/dfile.txt', {
+                                //     method: 'post',
+                                //     body: JSON.stringify({data: 'my data'})
+                                // }).then(req => req.json()).then(json => console.log(json))
+
                                 const dir = path.dirname(file);
 
                                 prepareDir(dir);
