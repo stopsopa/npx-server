@@ -1170,14 +1170,14 @@ hostname: ${os.hostname()}, node: ${process.version}
 
                     if (req.method === 'PATCH') {
 
-                        log(`${time()} PATCH (RENAME): \x1b[31mcdoesn't exist\x1b[0m: ${file}`);
+                        log(`${time()} PATCH (RENAME): \x1b[31mDoesn't exist\x1b[0m: ${file}`);
 
                         return restError(req, res,'PATCH', `Can't rename '${file}' because it doesn't exist`);
                     }
 
                     if (req.method === 'PUT') {
 
-                        log(`${time()} PUT (EDIT): \x1b[31mcan't update\x1b[0m: ${file}`);
+                        log(`${time()} PUT (EDIT): \x1b[31mCan't update\x1b[0m: ${file}`);
 
                         return restError(req, res,'PUT', `Can't update '${file}' because it doesn't exist`);
                     }
