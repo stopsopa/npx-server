@@ -79,6 +79,19 @@ const deleteFolderRecursive = function(p) {
     }
 };
 
+const restError = (req, res, method, msg) => {
+
+    res.setHeader(`Content-Type`, `application/json; charset=utf-8`);
+
+    res.statusCode = 500;
+
+    return res.end(JSON.stringify({
+        method,
+        url: req.url,
+        msg,
+    }));
+}
+
 const prepareDir = target => {
 
     try {
@@ -873,11 +886,74 @@ else {
 
                 if (req.method === 'PUT') {
 
-                    llog.dump({
-                        put: url,
-                        file,
-                    })
+                    // fetch('/file.txt', {
+                    //     method: 'put',
+                    //     body: JSON.stringify({data: 'data...'})
+                    // }).then(req => req.json()).then(json => console.log(json))
 
+                    if (isDir) {
+
+                        return restError(req, res, 'PUT',`directory '${file}' already exist`);
+                    }
+
+                    fs.unlinkSync(file);
+
+                    if (fs.existsSync(file)) {
+
+                        return restError(req, res, 'PUT',`can't remove file '${file}'`);
+                    }
+
+                    let json='';
+                    req.setEncoding('utf8');
+                    req.on('data', function(chunk) {
+                        json += chunk;
+                    });
+
+                    log(`${time()} PUT (EDIT): ${file}`);
+
+                    return req.on('end', function() {
+
+                        const raw = json;
+
+                        try {
+
+                            json = JSON.parse(json);
+
+                        } catch (e) {
+
+                            json = e;
+                        }
+
+                        try {
+
+                            fs.appendFileSync(file, json.data || '');
+
+                            if ( ! fs.existsSync(file) ) {
+
+                                return restError(req, res, 'PUT',`can't create file '${file}'`);
+                            }
+
+                            res.setHeader(`Content-Type`, `application/json; charset=utf-8`);
+
+                            return res.end(JSON.stringify({
+                                put: true,
+                            }));
+                        }
+                        catch (e) {
+
+                            res.setHeader(`Content-Type`, `application/json; charset=utf-8`);
+
+                            res.statusCode = 500;
+
+                            res.end(JSON.stringify({
+                                exception: 'PUT error',
+                                file,
+                                json,
+                                exceptionMessage: e.message,
+                                exceptionMessageSplit: (e.message + '').split("\n")
+                            }));
+                        }
+                    });
                 }
 
                 if (req.method === 'DELETE') {
@@ -1074,51 +1150,72 @@ hostname: ${os.hostname()}, node: ${process.version}
             }
             else {
 
-                if (edit && req.method === 'POST') {
+                if (edit) {
 
-                    let json='';
-                    req.setEncoding('utf8');
-                    req.on('data', function(chunk) {
-                        json += chunk;
-                    });
+                    if (req.method === 'PUT') {
 
-                    req.on('end', function() {
+                        log(`${time()} PUT (EDIT): \x1b[31mcan't update\x1b[0m: ${file}`);
 
-                        try {
+                        return restError(req, res,'PUT', `Can't update '${file}' because it doesn't exist`);
+                    }
 
-                            json = JSON.parse(json);
+                    if (req.method === 'POST') {
 
-                        } catch (e) {
+                        let json='';
+                        req.setEncoding('utf8');
+                        req.on('data', function(chunk) {
+                            json += chunk;
+                        });
 
-                            json = e;
-                        }
+                        req.on('end', function() {
 
-                        try {
+                            try {
 
-                            llog.dump({
-                                post: url,
-                                file,
-                            })
-                        }
-                        catch (e) {
+                                json = JSON.parse(json);
 
-                            res.setHeader(`Content-Type`, `application/json; charset=utf-8`);
+                            } catch (e) {
 
-                            res.statusCode = 500;
+                                json = e;
+                            }
 
-                            return res.end(JSON.stringify({
-                                exception: 'edit endpoint',
-                                url,
-                                json,
-                                query,
-                                method: req.method,
-                                exceptionMessage: e.message,
-                                exceptionMessageSplit: (e.message + '').split("\n")
-                            }));
-                        }
-                    });
+                            try {
 
-                    (logs & 1) && log(`${time()} \x1b[93m${res.statusCode}\x1b[0m: ${req.url}`);
+                                llog.dump({
+                                    post: url,
+                                    file,
+                                })
+                            }
+                            catch (e) {
+
+                                res.setHeader(`Content-Type`, `application/json; charset=utf-8`);
+
+                                res.statusCode = 500;
+
+                                return res.end(JSON.stringify({
+                                    exception: 'edit endpoint',
+                                    url,
+                                    json,
+                                    query,
+                                    method: req.method,
+                                    exceptionMessage: e.message,
+                                    exceptionMessageSplit: (e.message + '').split("\n")
+                                }));
+                            }
+                        });
+
+                        return;
+                    }
+
+                    res.setHeader(`Content-Type`, `application/json; charset=utf-8`);
+
+                    res.statusCode = 500;
+
+                    return res.end(JSON.stringify({
+                        exception: 'edit endpoint',
+                        query,
+                        method: req.method,
+                        error: 'unknown method',
+                    }));
                 }
                 else {
 
