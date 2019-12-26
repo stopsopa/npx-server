@@ -886,6 +886,8 @@ else {
 
                 if (req.method === 'POST') {
 
+                    log(`${time()} POST (CREATE): \x1b[31mCan't create\x1b[0m: ${file}`);
+
                     return restError(req, res, 'POST',`Can't create file '${file}' because it already exist`);
                 }
 
@@ -962,6 +964,8 @@ else {
                 }
 
                 if (req.method === 'DELETE') {
+
+                    log(`${time()} DELETE: ${file}`);
 
                     isDir ? deleteFolderRecursive(file) : fs.unlinkSync(file);
 
@@ -1157,6 +1161,20 @@ hostname: ${os.hostname()}, node: ${process.version}
 
                 if (edit) {
 
+                    if (req.method === 'DELETE') {
+
+                        log(`${time()} DELETE: \x1b[33mDoesn't exist\x1b[0m: ${file}`);
+
+                        return restError(req, res,'DELETE', `Can't delete '${file}' because it doesn't exist`);
+                    }
+
+                    if (req.method === 'PATCH') {
+
+                        log(`${time()} PATCH (RENAME): \x1b[31mcdoesn't exist\x1b[0m: ${file}`);
+
+                        return restError(req, res,'PATCH', `Can't rename '${file}' because it doesn't exist`);
+                    }
+
                     if (req.method === 'PUT') {
 
                         log(`${time()} PUT (EDIT): \x1b[31mcan't update\x1b[0m: ${file}`);
@@ -1210,8 +1228,6 @@ hostname: ${os.hostname()}, node: ${process.version}
 
                                     res.setHeader(`Content-Type`, `application/json; charset=utf-8`);
 
-                                    res.statusCode = 500;
-
                                     return res.end(JSON.stringify({
                                         post: true,
                                         dirMode: true,
@@ -1222,6 +1238,8 @@ hostname: ${os.hostname()}, node: ${process.version}
                                     return restError(req, res, 'POST', `Can't create directory '${file}', reason: ${e}`);
                                 }
                             }
+
+                            log(`${time()} POST (CREATE): file mode: ${file}`);
 
                             try {
 
