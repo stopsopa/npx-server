@@ -62,6 +62,23 @@ function isObject(a) {
 
 const mkdirP = require('./lib/mkdirp');
 
+/**
+ * from https://stackoverflow.com/a/32197381/5560682
+ */
+const deleteFolderRecursive = function(p) {
+    if (fs.existsSync(p)) {
+        fs.readdirSync(p).forEach((file, index) => {
+            const curPath = path.join(p, file);
+            if (fs.lstatSync(curPath).isDirectory()) { // recurse
+                deleteFolderRecursive(curPath);
+            } else { // delete file
+                fs.unlinkSync(curPath);
+            }
+        });
+        fs.rmdirSync(p);
+    }
+};
+
 const prepareDir = target => {
 
     try {
@@ -847,6 +864,34 @@ else {
 
             var isDir = fs.statSync(file).isDirectory();
 
+            if (edit) {
+
+                // fetch('/___raz.txt', {
+                //     method: 'delete',
+                //     body: JSON.stringify({post: 'dwa'})
+                // }).then(req => req.json()).then(json => console.log(json))
+
+                if (req.method === 'PUT') {
+
+                    llog.dump({
+                        put: url,
+                        file,
+                    })
+
+                }
+
+                if (req.method === 'DELETE') {
+
+                    isDir ? deleteFolderRecursive(file) : fs.unlinkSync(file);
+
+                    res.setHeader(`Content-Type`, `application/json; charset=utf-8`);
+
+                    return res.end(JSON.stringify({
+                        delete: true,
+                    }));
+                }
+            }
+
             if (isDir) {
 
                 if (args.get('noindex')) {
@@ -1029,8 +1074,7 @@ hostname: ${os.hostname()}, node: ${process.version}
             }
             else {
 
-
-                if (edit && url === '/__create.edit') {
+                if (edit && req.method === 'POST') {
 
                     let json='';
                     req.setEncoding('utf8');
@@ -1039,8 +1083,6 @@ hostname: ${os.hostname()}, node: ${process.version}
                     });
 
                     req.on('end', function() {
-
-                        const raw = json;
 
                         try {
 
@@ -1051,19 +1093,12 @@ hostname: ${os.hostname()}, node: ${process.version}
                             json = e;
                         }
 
-                        const method = req.method;
-
                         try {
 
-                            res.setHeader('Content-Type', 'application/json; charset=utf-8');
-                            //
-                            // res.statusCode = 201;
-
-                            return res.end(JSON.stringify({
-                                method,
-                                json,
-                                query,
-                            }, null, 4));
+                            llog.dump({
+                                post: url,
+                                file,
+                            })
                         }
                         catch (e) {
 
@@ -1073,7 +1108,10 @@ hostname: ${os.hostname()}, node: ${process.version}
 
                             return res.end(JSON.stringify({
                                 exception: 'edit endpoint',
-                                method,
+                                url,
+                                json,
+                                query,
+                                method: req.method,
                                 exceptionMessage: e.message,
                                 exceptionMessageSplit: (e.message + '').split("\n")
                             }));
