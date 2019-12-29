@@ -916,8 +916,18 @@ else {
 
                         try {
 
-                            var n = path.resolve(dir, '.' + path.sep + (decodeURI(json.new).replace(/\.\.+/g, '.')));
+                            var n;
 
+
+                            if (json.new.substring(0, 1) === '/') {
+
+                                n = path.resolve(dir, '.' + path.sep + (decodeURI(json.new).replace(/\.\.+/g, '.')));
+                            }
+                            else {
+
+                                n = path.resolve(path.dirname(file), '.' + path.sep + (decodeURI(json.new).replace(/\.\.+/g, '.')));
+                            }
+                            
                             log(`${time()} PATCH (RENAME): ${file} -> ${n}`);
 
                             if ( fs.existsSync(n) ) {
