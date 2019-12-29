@@ -881,10 +881,12 @@ else {
 
             if (edit) {
 
-                // fetch('/___raz.txt', {
-                //     method: 'delete',
-                //     body: JSON.stringify({post: 'dwa'})
-                // }).then(req => req.json()).then(json => console.log(json))
+                // fetch('test.txt', {
+                //     method: 'PATCH', // must be uppercase, I'm not entirely sure why
+                //     body: JSON.stringify({
+                //         new: '/pvc/te.txt' // must be absolute path from web dir.. for now @todo - maybe it shouldn't be?
+                //     })
+                // })
 
                 if (method === 'PATCH') {
 
