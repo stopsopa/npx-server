@@ -4,6 +4,8 @@ README.md
 LICENSE
 /docs/
 /docker/
+*.tgz
+*.tar.gz
 
 
 
