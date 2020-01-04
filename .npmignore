@@ -1,8 +1,6 @@
 /.travis.sh
 /.travis.yml
 /DEV.md
-/LICENSE
-/README.md
 /.installgnore
 /update.sh
 .DS_Store
