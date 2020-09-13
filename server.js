@@ -776,7 +776,16 @@ else {
 
                     const ext = path.extname(file);
 
-                    if (ext !== '.js') {
+                    const isDir = fs.lstatSync(lib).isDirectory();
+
+                    if ( isDir ) {
+
+                        return acc;
+                    }
+
+                    const content = fs.readFileSync(lib, 'utf8').toString();
+
+                    if (ext !== '.js' || !content.includes('module.exports = controller;')) {
 
                         return acc;
                     };
