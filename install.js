@@ -8,7 +8,7 @@ const createIgnoreFilter = (ignorefile, root) => {
 
     let ignore = fs.readFileSync(ignorefile).toString();
 
-    ignore = ignore.split("\n").map(n => n.trim()).filter(n => n.indexOf('#') !== 0).map(n => n.indexOf('/') ? n.substring(1) : n).filter(Boolean);
+    ignore = ignore.split("\n").map(n => n.trim()).filter(n => n.indexOf('#') !== 0).map(n => n.indexOf('/') === 0 ? n.substring(1) : n).filter(Boolean);
 
     /**
      * https://www.npmjs.com/package/ignore v4.0.2
