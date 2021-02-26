@@ -1,6 +1,6 @@
 {
   "name": "npx-server",
-  "version": "0.0.44",
+  "version": "0.0.45",
   "description": "No dependency, single file/script http server",
   "main": "install.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "url": "git+https://github.com/stopsopa/npx-server.git"
   },
   "bin": {
-    "npx-server": "./install.js"
+    "npx-server": "install.js"
   },
   "keywords": [
     "npx",
