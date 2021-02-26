@@ -765,7 +765,7 @@ else {
 
         type(req, res, 'html');
 
-        (logs & 2) && log(`${time()} \x1b[35m${res.statusCode}\x1b[0m: ${req.url}`);
+        (logs & 2) && log(`${time()} ${color(res.statusCode, 'FgMagenta')}: ${req.url}`);
 
         res.end(`<div style="color: #92317B; font-family: tahoma;">${notype ? '' : (isDir ? 'directory' : 'file')} ${req.url} no access.</div>`);
     }
@@ -853,7 +853,7 @@ else {
 
         if (url === '/favicon.ico') {
 
-            (logs & 4) && log(`${time()} \x1b[33m${res.statusCode}\x1b[0m: ${url}`);
+            (logs & 4) && log(`${time()} ${color(res.statusCode, 'FgYellow')}: ${url}`);
 
             res.statusCode = 200;
             res.setHeader('Content-Type', 'image/x-icon');
@@ -952,7 +952,7 @@ else {
 
                         if ( typeof json.new !== 'string' ) {
 
-                            log(`${time()} PATCH (RENAME): \x1b[31mCan't rename\x1b[0m ${file}`);
+                            log(`${time()} PATCH (RENAME): ${color(`Can't rename`, 'FgRed')} ${file}`);
 
                             return restError(req, res,'PATCH', `Can't rename '${file}' because new name was not given`);
                         }
@@ -1017,7 +1017,7 @@ else {
 
                 if (method === 'POST') {
 
-                    log(`${time()} POST (CREATE): \x1b[31mCan't create\x1b[0m: ${file}`);
+                    log(`${time()} POST (CREATE): ${color(`Can't create`, 'FgRed')}: ${file}`);
 
                     return restError(req, res, 'POST',`Can't create file '${file}' because it already exist`);
                 }
@@ -1119,7 +1119,7 @@ else {
 
                     res.writeHead(302, { 'Location': url + '/' });
 
-                    (logs & 4) && log(`${time()} \x1b[33m${res.statusCode}\x1b[0m: ${url} -> ${url + '/'}`);
+                    (logs & 4) && log(`${time()} ${color(res.statusCode, 'FgYellow')}: ${url} -> ${url + '/'}`);
 
                     return res.end();
                 }
@@ -1202,7 +1202,7 @@ hostname: ${os.hostname()}, node: ${process.version}
                     return noAccess(req, res, isDir);
                 }
 
-                (logs & 8) && log(`${time()} \x1b[36m${res.statusCode}\x1b[0m: [\x1b[36mautoindex\x1b[0m] ${req.url}`);
+                (logs & 8) && log(`${time()} ${color(res.statusCode, 'FgCyan')}: [${color('autoindex', 'FgCyan')}] ${req.url}`);
 
                 return res.end(addWatcher(list, type(req, res, 'html')));
             }
@@ -1235,7 +1235,7 @@ hostname: ${os.hostname()}, node: ${process.version}
                 return noAccess(req, res, isDir);
             }
 
-            (logs & 2) && log(`${time()} \x1b[32m${res.statusCode}\x1b[0m: ${req.url}`);
+            (logs & 2) && log(`${time()} ${color(res.statusCode, 'FgGreen')}: ${req.url}`);
         }
         else {
 
@@ -1286,7 +1286,7 @@ hostname: ${os.hostname()}, node: ${process.version}
                     }
                 });
 
-                (logs & 1) && log(`${time()} \x1b[93m${res.statusCode}\x1b[0m: ${req.url}`);
+                (logs & 1) && log(`${time()} ${color(res.statusCode, 'FgYellow')}: ${req.url}`);
             }
             else {
 
@@ -1294,21 +1294,21 @@ hostname: ${os.hostname()}, node: ${process.version}
 
                     if (method === 'DELETE') {
 
-                        log(`${time()} DELETE: \x1b[31mDoesn't exist\x1b[0m: ${file}`);
+                        log(`${time()} DELETE: ${color(`Doesn't exist`, 'FgRed')}: ${file}`);
 
                         return restError(req, res,'DELETE', `Can't delete '${file}' because it doesn't exist`);
                     }
 
                     if (method === 'PATCH') {
 
-                        log(`${time()} PATCH (RENAME): \x1b[31mDoesn't exist\x1b[0m: ${file}`);
+                        log(`${time()} PATCH (RENAME): ${color(`Doesn't exist`, 'FgRed')}: ${file}`);
 
                         return restError(req, res,'PATCH', `Can't rename '${file}' because it doesn't exist`);
                     }
 
                     if (method === 'PUT') {
 
-                        log(`${time()} PUT (EDIT): \x1b[31mCan't update\x1b[0m: ${file}`);
+                        log(`${time()} PUT (EDIT): ${color(`Can't update`, 'FgRed')}: ${file}`);
 
                         return restError(req, res,'PUT', `Can't update '${file}' because it doesn't exist`);
                     }
@@ -1452,7 +1452,7 @@ hostname: ${os.hostname()}, node: ${process.version}
 
                     res.end(`<div style="color: #b10000; font-family: tahoma;">status code ${res.statusCode}: ${req.url}</div>`);
 
-                    (logs & 1) && log(`${time()} \x1b[31m${res.statusCode}\x1b[0m: ${req.url}`);
+                    (logs & 1) && log(`${time()} ${color(res.statusCode, 'FgRed')}: ${req.url}`);
                 }
             }
         }
