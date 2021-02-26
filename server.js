@@ -30,6 +30,40 @@ var etag=function(){
     "use strict";var t=require("crypto"),e=require("fs").Stats,r=Object.prototype.toString;return function(n,i){if(null==n)throw new TypeError("argument entity is required");var o=(u=n,"function"==typeof e&&u instanceof e||u&&"object"==typeof u&&"ctime"in u&&"[object Date]"===r.call(u.ctime)&&"mtime"in u&&"[object Date]"===r.call(u.mtime)&&"ino"in u&&"number"==typeof u.ino&&"size"in u&&"number"==typeof u.size),f=i&&"boolean"==typeof i.weak?i.weak:o;var u;if(!o&&"string"!=typeof n&&!Buffer.isBuffer(n))throw new TypeError("argument entity must be string, Buffer, or fs.Stats");var a,s,c=o?(s=(a=n).mtime.getTime().toString(16),'"'+a.size.toString(16)+"-"+s+'"'):function(e){if(0===e.length)return'"0-2jmj7l5rSw0yVb/vlWAYkK/YBwk"';var r=t.createHash("sha1").update(e,"utf8").digest("base64").substring(0,27);return'"'+("string"==typeof e?Buffer.byteLength(e,"utf8"):e.length).toString(16)+"-"+r+'"'}(n);return f?"W/"+c:c}}();
 
 
+// https://i.imgur.com/mWzuQWP.png
+const color = (function (c) {
+    return (...args) => c[args.pop()] + args.join('') + c.reset;
+}({
+    Bright      : "\x1b[1m",
+    Dim         : "\x1b[2m",
+    Underscore  : "\x1b[4m",
+    Blink       : "\x1b[5m",
+    Reverse     : "\x1b[7m",
+    Hidden      : "\x1b[8m",
+    FgBlack     : "\x1b[30m",
+    FgRed       : "\x1b[31m", // red
+    FgGreen     : "\x1b[32m", // green
+    FgYellow    : "\x1b[33m", // yellow
+    FgBlue      : "\x1b[34m",
+    FgMagenta   : "\x1b[35m", // magenta
+    FgCyan      : "\x1b[36m", // cyan
+    FgWhite     : "\x1b[37m",
+    BgBlack     : "\x1b[40m",
+    BgRed       : "\x1b[41m",
+    BgGreen     : "\x1b[42m",
+    BgYellow    : "\x1b[43m",
+    BgBlue      : "\x1b[44m",
+    BgMagenta   : "\x1b[45m",
+    BgCyan      : "\x1b[46m",
+    BgWhite     : "\x1b[47m",
+    r           : "\x1b[31m", // red
+    g           : "\x1b[32m", // green
+    y           : "\x1b[33m", // yellow
+    m           : "\x1b[35m", // magenta
+    c           : "\x1b[36m", // cyan
+    reset       : "\x1b[0m",
+}));
+
 var staticServer = '-staticServer-';
 // var staticServer = false;
 
@@ -1424,8 +1458,15 @@ hostname: ${os.hostname()}, node: ${process.version}
         }
     });
 
+    var displayPort = ``;
+
+    if (port != 80) {
+
+        displayPort = `:${port}`;
+    }
+
     log(`
-         🌎  Listening on port ${port}, start time: ${time()}
+         🌎  Listening on port ${color(`http://localhost${displayPort}`, 'g')} start time: ${time()}
             serving files from directory ${dir}, --help for more info
     `);
 
