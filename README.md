@@ -17,7 +17,7 @@ It's just simple HTTP server with
 
 
 
-    npx npx-server
+    npx npx-server@latest
     
     or
     
