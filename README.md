@@ -28,3 +28,12 @@ It's just simple HTTP server with
     npx npx-server [server_file_name.js] [controllers_directory]
     
     
+    
+    
+# Warning
+
+Server have no XSS protection and might have other security issues. In wrong hands, badly managed it might present security thread.
+
+Script is mostly created for local development/testing purposes with main goal to quickly bring it where it is needed and launch without dependencies. 
+
+I wouldn't recommend it to use on production.
