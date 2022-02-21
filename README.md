@@ -37,3 +37,15 @@ Server have no XSS protection and might have other security issues. In wrong han
 Script is mostly created for local development/testing purposes with main goal to quickly bring it where it is needed and launch without dependencies. 
 
 I wouldn't recommend it to use on production.
+
+# Notes
+
+Simple equivalent in python would be: 
+
+```bash
+
+python -m http.server 8000
+# or
+python -m SimpleHTTPServer 8000
+
+```
