@@ -11,6 +11,12 @@ It's just simple HTTP server with
 - everything shipped in one .js file with no dependencies. 
 - one command installation
 
+Techniques:
+It was written just in plain js without any bundlers to just serve files, but later it was extended gradually with more and more features.
+It supposed to be just dirty tool to do the job from one file, for some testing.
+What I'm trying to say is: It's ugly and I never had intention to make it pretty. But it was still fun to build it at some point.
+
+
 
 
 [![npx-server youtube demo](https://user-images.githubusercontent.com/3743506/48829880-40d84900-ed6b-11e8-8a9b-ff566f15d2a9.png)](http://www.youtube.com/watch?v=uAO9Buimxys)
