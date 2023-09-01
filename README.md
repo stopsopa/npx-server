@@ -1,6 +1,8 @@
 [![npm version](https://badge.fury.io/js/npx-server.svg)](https://badge.fury.io/js/npx-server)
 [![NpmLicense](https://img.shields.io/npm/l/npx-server.svg)](https://github.com/stopsopa/npx-server/blob/master/LICENSE)
 
+Created in 2018 - quite old now
+
 
 What's that?
 
@@ -12,6 +14,7 @@ It's just simple HTTP server with
 - one command installation
 
 Techniques:
+
 It was written just in plain js without any bundlers to just serve files, but later it was extended gradually with more and more features.
 It supposed to be just dirty tool to do the job from one file, for some testing.
 What I'm trying to say is: It's ugly and I never had intention to make it pretty. But it was still fun to build it at some point.
