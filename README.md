@@ -1,7 +1,7 @@
 [![npm version](https://badge.fury.io/js/npx-server.svg)](https://badge.fury.io/js/npx-server)
 [![NpmLicense](https://img.shields.io/npm/l/npx-server.svg)](https://github.com/stopsopa/npx-server/blob/master/LICENSE)
 
-Created in 2018 - quite old now
+Created in 2018 - quite old now and not maintained
 
 
 What's that?
